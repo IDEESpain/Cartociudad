@@ -1,0 +1,101 @@
+<html>
+
+    <head>
+        <title>Visor geocoder</title>
+
+        <!-- Estilo de la API -->
+        <link type="text/css" rel="stylesheet" href="https://componentes.cnig.es/api-core/assets/css/apiign.ol.min.css">
+        <link href="https://componentes.cnig.es/api-core/plugins/toc/toc.ol.min.css" rel="stylesheet" />
+
+        <style type="text/css">
+            html,
+            body {
+                margin: 0;
+                padding: 0;
+                height: 100%;
+                overflow: hidden;
+                }
+            </style>
+
+            <!-- Ficheros javascript de la API -->
+        <meta charset="utf-8">
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/vendor/browser-polyfill.js"></script>
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/js/apiign.ol.min.js"></script>
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/js/configuration.js"></script>
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/plugins/toc/toc.ol.min.js"></script>
+
+        <!-- Extensión ignsearchlocator-->
+        <!--  
+        <link href="https://componentes.cnig.es/api-core/plugins/ignsearchlocator/ignsearchlocator.ol.min.css" rel="stylesheet" />  
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/plugins/ignsearchlocator/ignsearchlocator.ol.min.js"></script>
+        -->
+        <link href="https://componentes.cnig.es/api-core/plugins/locator/locator.ol.min.css" rel="stylesheet" />  
+        <script type="text/javascript" src="https://componentes.cnig.es/api-core/plugins/locator/locator.ol.min.js"></script>
+
+    </head>
+
+
+    <body>
+        <!-- Contenedor principal del mapa -->
+        
+        <div id="mapjs" class="m-container"></div>
+
+         <script type="text/javascript">
+
+            // Configuración del mapa
+            const mapjs = M.map({
+                container: 'mapjs', //id del contenedor del mapa
+                controls: ['scale*true', 'scaleline', 'backgroundlayers'],
+                zoom: 6,
+                maxZoom: 20,
+                minZoom: 6,
+                center: ol.proj.fromLonLat([-3, 40]),
+                });
+
+            // Configuración de la extensión ignsearchlocator
+            /*
+            const mp = new M.plugin.IGNSearchLocator({
+              servicesToSearch: 'g',
+              isCollapsed: false,
+              noProcess: ' ',
+              ignsearchlocator:'entityFound',
+              position: 'TL',
+              reverse: true,
+              cadastre: false,
+              searchCoordinatesXYZ: false,
+              maxResults: 15, // se le suma luego 5 internamente en el plugin...
+              urlCandidates:'/geocoder/api/geocoder/candidatesJsonp',
+              urlFind:'/geocoder/api/geocoder/findJsonp',
+              urlReverse:'/geocoder/api/geocoder/reverseGeocode',
+            });
+            */
+         	
+            // Configuración de la extensión ignsearchlocator
+            const mp = new M.plugin.Locator({
+              position: 'TL',
+              collapsed: false,
+              collapsible:false,
+              useProxy:false,
+              tooltip:'Servicio REST geocoder',
+              ignsearchlocator:'entityFound',
+              byParcelCadastre:false,
+              byCoordinates:false,
+              byPlaceAddressPostal: {
+            	  servicesToSearch: 'g',
+            	  noProcess: '',
+            	  reverse: true,
+            	  maxResults: 33,
+            	  urlCandidates:'/geocoder/api/geocoder/candidatesJsonp',
+                  urlFind:'/geocoder/api/geocoder/findJsonp',
+                  urlReverse:'/geocoder/api/geocoder/reverseGeocode'
+              }
+            });
+
+            mapjs.addPlugin(mp);   
+            
+        </script>
+
+    </body>
+
+
+</html>

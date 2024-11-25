@@ -1,0 +1,70 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<script src="js/jquery-1.9.1.js"></script>
+<title>Calculo masivo de direcciones</title>
+</head>
+<body>
+	<!--  
+	<h1>Obtenci&oacute;n de coordenadas</h1>
+    <form action="api/geocoder/csvfindlist" method="post" enctype="multipart/form-data">
+       <p>
+        Por favor, seleccione el fichero de entrada : <br>
+        <input type="file" name="file" size="50" />
+       </p>
+       <input id="submit1" type="submit" value="Subir el fichero y calcular coordenadas." />
+       <p>&nbsp;<label id="message1" style="display:none">Cargando... (este proceso puede durar unos segundos)</label></p>
+    </form>
+    
+    
+    <h1>Obtenci&oacute;n de direcciones</h1>
+    <form action="api/geocoder/csvreverselist" method="post" enctype="multipart/form-data">
+       <p>
+        Por favor, seleccione el fichero de entrada : <br>
+        <input type="file" name="file" size="50" />
+       </p>
+       <input id="submit2" type="submit" value="Subir el fichero y obtener direcciones" />
+        <p>&nbsp;<label id="message2" style="display:none">Cargando... (este proceso puede durar unos segundos)</label></p>
+    </form>
+    
+    <h1>Obtenci&oacute;n de datos para SETELECO</h1>
+    <form action="api/geocoder/seteleco/csv" method="post" enctype="multipart/form-data">
+       <p>
+        Por favor, seleccione el fichero de entrada : <br>
+        <input type="file" name="file" size="50" />
+       </p>
+       <input id="submit3" type="submit" value="Subir el fichero" />
+        <p>&nbsp;<label id="message3" style="display:none">Cargando... (este proceso puede durar unos segundos)</label></p>
+    </form>
+    -->
+    <h1>Calculadora unificada de direcciones postales</h1>
+    <form action="api/geocoder/unifiedcsvgeocoding" method="post" enctype="multipart/form-data">
+       <p>
+        Por favor, seleccione el fichero de entrada : <br>
+        <input type="file" name="file" size="50" />
+       </p>
+       <input id="submit4" type="submit" value="Subir el fichero" />
+        <p>&nbsp;<label id="message4" style="display:none">Cargando... (este proceso puede durar unos segundos)</label></p>
+    </form>
+    
+</body>
+<script>
+/*
+$("#submit1").click(function(){
+	$("#message1").css("display", "block");
+});
+
+$("#submit2").click(function(){
+	$("#message2").css("display", "block");
+});
+
+$("#submit3").click(function(){
+	$("#message3").css("display", "block");
+});
+*/
+$("#submit4").click(function(){
+	$("#message4").css("display", "block");
+});
+</script>
+</html>

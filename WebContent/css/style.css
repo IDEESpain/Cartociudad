@@ -1,0 +1,154 @@
+body {                
+    color: #000;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;    
+    line-height: 1.4;    
+    color: #111111;
+    background-color: #EEEEEE;
+    margin: 0;
+}
+#autocompleteFrom {
+	font-size: 9px;
+}
+
+#autocompleteTo {
+	font-size: 9px;
+}
+
+#map {
+/*    float: right;*/
+    width: 800px;
+    height: 600px;
+    cursor: default;
+}
+#input {
+    float: left;                
+    padding-left: 10px; 
+    padding-right: 20px; 
+}
+.defaulting {
+    color: rgb(128, 128, 128);
+}
+#info {
+    border: rgb(211, 211, 211) groove thin;
+    display: none;
+    padding: 5px;
+    overflow: auto;
+}
+#info a {
+    padding-right: 5px;
+}
+#input, #instructions {
+    width: 250px;
+}
+#fromInput, #toInput {
+    width: 210px;
+}
+#fromFound, #toFound {
+    font-size: 10px;
+    color: gray;
+    padding-top: 4px;
+    padding-bottom: 5px;
+}
+.warn {
+    color: orange;
+}
+.error {
+    color: red;
+}
+#moreattribution a {
+    text-decoration: none;
+    color: black
+}
+#moreattribution {
+    padding-top: 20px;
+    color: #666666                    
+}
+#fromDiv img, #toDiv img {
+    margin-top: 4px;
+    padding-right: 3px;                
+    float: left;
+}
+.left {
+    float: left;
+}
+#routeDetails {
+    font-size: 12px;
+}
+.hidden {
+    display: none;
+}
+.no_link {
+    text-decoration: none;
+    color: black;
+}
+.no_link img {
+    margin-bottom: -10px;
+}
+.small_text {
+    font-size: small;
+}
+#options {
+    padding-bottom: 10px;
+    padding-left: 20px;
+}
+.bold {
+    font-weight: bold;
+}
+#header_img {
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-family: "Fira Sans";
+    font-weight: bold;
+    font-size: 24px;
+}
+
+.sidebar{
+    background: linear-gradient(to right, rgba(1, 9, 77, 0.897), rgba(28, 177, 222, 0.757));
+    height:100vh;
+    color:rgb(242, 251, 253);
+}
+
+#searchButton {
+    float: right;
+    margin-bottom: 5px;
+}
+.clear {
+    clear: both;
+}
+#hosting {
+    padding-top: 10px;
+    color: gray;                
+}
+#hosting a {
+    color: gray;                
+}
+
+.instruction {    
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+tr.instruction td {
+    border-bottom: rgb(245, 245, 220) groove thin;
+}
+#instructions {
+    border-collapse: collapse;
+    padding-top: 10px;
+    width: 100%;
+    font-size: smaller;
+}
+#instructions th, #instructions td {
+    padding: 3px;
+}
+.instr_title {    
+}
+.instr_distance_td {
+    min-width: 40px;
+}
+.instr_distance {
+    float: right;    
+    color: rgb(128, 128, 128);
+}
+.instr_pic {    
+    max-height: 24px;
+    max-width: 16px;
+}
