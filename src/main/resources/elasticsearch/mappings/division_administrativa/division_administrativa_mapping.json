@@ -1,0 +1,219 @@
+{
+    "mappings":
+    {
+        "properties":
+        {
+            "direccion":
+            {
+                "type": "text",
+                "fields": 
+                {    
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "es_literal":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_literal"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "obj_id": 
+            {
+                "type": "long"
+            },
+            "text_original":
+            {
+                "type": "text",
+                "fields": 
+                {    
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "es_literal":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_literal"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "ine_mun":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "table_name": 
+            {
+                "type":"text",
+                "fields": 
+                {    
+                    "es": 
+                    {
+                        "type": "text",
+                        "analyzer": "es_analyzer"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }    
+            },
+            "ine_prov":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nom_prov_original":
+            {
+                "type": "text",
+                "fields": 
+                {    
+                    "es": 
+                    {
+                        "type": "text",
+                        "analyzer": "es_analyzer"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "ine_comunidad":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nom_comunidad_original":
+            {
+                "type": "text",
+                "fields": 
+                {    
+                    "es": 
+                    {
+                        "type": "text",
+                        "analyzer": "es_analyzer"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "lng":
+            {
+                "type": "double"
+            },
+            "lat":
+            {
+                "type": "double"
+            },
+            "geom":
+            {
+                "type": "text"
+            }
+        }
+    },
+    "settings":
+    {
+        "analysis":
+        {
+            "analyzer":
+            {
+                "es_analyzer":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "es_stemmer_override",
+                        "es_stemmer",
+                        "es_synonym",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer_literal":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "asciifolding"
+                    ]
+                }
+            },
+            "char_filter": {
+                "dash_char_filter": {
+                    "type": "mapping",
+                    "mappings": [
+                        "- => "
+                    ]
+                }
+            },
+            "filter":
+            {
+                "es_stop":
+                {
+                    "type": "stop",
+                    "stopwords_path": "stopwords/stopwords.txt"
+                },
+                "es_stemmer":
+                {
+                    "type": "stemmer",
+                    "language": "light_spanish"
+                },
+                "es_stemmer_override":
+                {
+                    "type": "stemmer_override",
+                    "rules": [
+                        "calles => calles"
+                    ]
+                },
+                "es_synonym": {
+                    "type": "synonym",
+                    "synonyms_path": "synonyms/synonyms_general.txt"
+                }
+            }
+        }
+    }
+}

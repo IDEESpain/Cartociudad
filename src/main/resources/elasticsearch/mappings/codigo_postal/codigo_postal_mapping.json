@@ -1,0 +1,43 @@
+{
+    "mappings":
+    {
+        "properties":
+        {
+            "obj_id": 
+            {
+                "type": "long"
+            },
+            "text_original":
+            {
+                "type": "text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "ine_mun":
+            {
+                "type":"text"
+            },
+            "lng":
+            {
+                "type": "double"
+            },
+            "lat":
+            {
+                "type": "double"
+            },
+            "geom":
+            {
+                "type": "text"
+            }
+        }
+    }
+}

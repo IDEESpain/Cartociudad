@@ -1,0 +1,439 @@
+{
+    "mappings":
+    {
+        "properties":
+        {
+            "direccion":
+            {
+                "type": "text",
+                "fields": 
+                {    
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_direccion"
+                    },
+                    "es_literal":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_literal"
+                    },
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "obj_id":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "tipo_via":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_road_type"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "text_original":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "es_literal":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_literal"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "table_name":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "id_pob":
+            {
+                "type":"text"
+            },
+            "ent_pob_original":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "ine_mun":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nom_muni_original":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "ine_prov":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nom_prov_original":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "cod_postal":
+            {
+                "type":"text"
+            },
+            "ref_catastral":
+            {
+                "type":"text"
+            },
+            "tipo":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "subtipo":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "ine_comunidad":
+            {
+                "type":"text",
+                "fields": 
+                { 
+                    "keyword": 
+                    {
+                        "type": "keyword"
+                    }
+                }
+            },
+            "nom_comunidad_original":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                }
+            },
+            "numero":
+            {
+                "type":"integer",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer": "es_analyzer_word_num"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "extension":
+            {
+                "type":"text",
+                "fields":
+                {
+                    "es":
+                    {
+                        "type":"text",
+                        "analyzer":"es_analyzer_word_ext"
+                    },
+                    "keyword":
+                    {
+                        "type":"keyword"
+                    }
+                },
+                "copy_to": ["direccion"]
+            },
+            "sin_numero":
+            {
+                "type":"boolean"
+            },
+            "tipo_porpk":
+            {
+                "type":"long"
+            },
+            "lng":
+            {
+                "type": "double"
+            },
+            "lat":
+            {
+                "type": "double"
+            },
+            "geom":
+            {
+                "type":"geo_point"
+            }
+        }
+    },
+    "settings":
+    {
+        "analysis":
+        {
+            "analyzer":
+            {
+                "es_analyzer_direccion":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter",
+                        "km_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "es_stemmer_override",
+                        "es_stemmer",
+                        "es_synonym",
+                        "es_synonym_road_type",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter",
+                        "km_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "es_stemmer_override",
+                        "es_stemmer",
+                        "es_synonym",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer_literal":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter",
+                        "km_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer_road_type":
+                {
+                    "tokenizer": "standard",
+                    "char_filter": [
+                        "dash_char_filter"
+                    ],
+                    "filter":
+                    [
+                        "lowercase",
+                        "es_stop",
+                        "es_stemmer_override",
+                        "es_stemmer",
+                        "es_synonym_road_type",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer_word_ext":
+                {
+                    "tokenizer": "whitespace",
+                    "filter":
+                    [
+                        "lowercase",
+                        "word_delimiter_graph",
+                        "replace_dash",
+                        "es_stop",
+                        "es_stemmer_override",
+                        "es_stemmer",
+                        "asciifolding"
+                    ]
+                },
+                "es_analyzer_word_num":
+                {
+                    "tokenizer": "keyword",
+                    "filter":
+                    [
+                        "my_custom_word_delimiter_graph"
+                    ]
+                }
+            },
+            "char_filter": {
+                "dash_char_filter": {
+                    "type": "mapping",
+                    "mappings": [
+                        "- => "
+                    ]
+                },
+                "km_char_filter": {
+                    "type": "mapping",
+                    "mappings": [
+                        "km => "
+                    ]
+                }
+            },
+            "filter":
+            {
+                "es_stop":
+                {
+                    "type": "stop",
+                    "stopwords_path": "stopwords/stopwords.txt"
+                },
+                "es_stemmer":
+                {
+                    "type": "stemmer",
+                    "language": "light_spanish"
+                },
+                "es_stemmer_override":
+                {
+                    "type": "stemmer_override",
+                    "rules": [
+                        "calles => calles"
+                    ]
+                },
+                "es_synonym": {
+                    "type": "synonym",
+                    "synonyms_path": "synonyms/synonyms_general.txt"
+                },
+                "es_synonym_road_type": {
+                    "type": "synonym",
+                    "synonyms_path": "synonyms/synonyms_road_type.txt"
+                },
+                "replace_dash":
+                {
+                    "type": "pattern_replace",
+                    "pattern": "-",
+                    "replacement": "",
+                    "all": true
+                },
+                "my_custom_word_delimiter_graph": {
+                    "type": "word_delimiter_graph",
+                    "type_table": [ "- => DIGIT" ],
+                    "generate_word_parts": false,
+                    "split_on_case_change": false,
+                    "stem_english_possessive": false
+                }
+            }
+        }
+    }
+}
