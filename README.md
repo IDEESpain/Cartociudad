@@ -11,12 +11,12 @@ Geocoder sustenta las operaciones de búsqueda de Cartociudad (https://www.carto
 
 Es conveniente aclarar cómo funciona la búsqueda de candidatos en cuanto a la cadena de búsqueda:
 - Si la cadena de búsqueda no contiene número, se busca sobre Divisiones Administrativas (Poblaciones, Municipios, Provincias, Comunidades Autónomas), Viales, Carreteras y Topónimos
-- Si la cadena de búsqueda contiene algún número, se busca sobre Divisiones Administrativas (Poblaciones, Municipios, Provincias, Comunidades Autónomas), Viales, Carreteras, Topónimos, Portales y Puntos Kilométricos
+- Si la cadena de búsqueda contiene algún número, se busca sobre Divisiones Administrativas (Poblaciones, Municipios, Provincias, Comunidades Autónomas), Viales, Carreteras, Topónimos, **Portales y Puntos Kilométricos**
 - Si la cadena solo contiene números y son de la longitud adecuada, se buscan Códigos Postales
 
 Es importante comentar el orden intrínseco de las tipologías, y el número de registros de cada tipología, siendo lo siguiente:
 - Poblaciones: 2 registros
-- Municipio:  registros
+- Municipio:  3 registros
 - Callejero (viales urbanos): 7 registros
 - Carretera (viales interurbana): 4 registros
 - Portales y puntos kilométricos: 6 registros
@@ -62,7 +62,7 @@ En la siguiente tabla se recogen aquellos que son configurables, dando el nombre
 | expendeduria_table_name_elements | Número de elementos a mostrar de la tipología expededuría | 2 |
 | ngbe_table_name_elements | Número de elementos a mostrar de la tipología ngbe (Nomenclator Geográfico Básico de España) | 2 |
 | punto_recarga_electrica_table_name | Número de elementos a mostrar de la tipología punto de recarga eléctrica| 2 |
-| reverse_buffer | Buffer para el filtro de la consulta reverse (obtener direccion a partir de una x e y) | 20m |
+| reverse_buffer | Buffer para el filtro de la consulta reverse (obtener direccion a partir de una x e y) | 350m |
 | unified_max_rows | Filas que se procesan del CSV (sin contar cabecera) | 60000 |
 
 
