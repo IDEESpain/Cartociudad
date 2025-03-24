@@ -38,7 +38,7 @@ El servicio a partir de una petición busca y devuelve un JSON con los resultado
         - Viales (interurbana): 'no_process=carretera'
         - Portales o puntos kilométricos: 'no_process=portal'
           También se puede hacer la combinación de todas o algunas de ellas.
-*Ejemplo: No localizar las direcciones postales (Salamanca), y que solamente muestre municipios, población o topónimos que tengan la mayor similitud a la búsqueda.*
+*Ejemplo: No localizar las direcciones postales, ni municipios y que muestre todo elemento que tengan la mayor similitud fónetica a Salamanca.*
 https://www.cartociudad.es/geocoder/api/geocoder/candidates?q=salamanca&limit=6&no_process=callejero,municipio
 - **Filtros**: Se pueden hacer búsquedas de elementos que estén en un/unos códigos postales, unidades administrativas y entidades de población en concreto:
     - cod_postal_filter (opcional): permite realizar una búsqueda en un/unos códigos postales. Hay que poner un código postal seguido de otro con comas y sin espacios, ejemplo: 'cod_postal_filter=28003,28022'
@@ -63,18 +63,18 @@ Es conveniente aclarar cómo funciona la búsqueda de candidatos en cuanto a la 
 - Si la cadena de búsqueda contiene algún número, se busca sobre Divisiones Administrativas (Poblaciones, Municipios, Provincias, Comunidades Autónomas), Viales, Carreteras, Topónimos, **Portales y Puntos Kilométricos**
 - Si la cadena solo contiene números y son de la longitud adecuada, se buscan Códigos Postales
 
-Es importante comentar el orden intrínseco de las tipologías, y el número de registros de cada tipología, siendo lo siguiente:
-- Poblaciones: 2 registros
-- Municipio:  3 registros
-- Callejero (viales urbanos): 7 registros
-- Carretera (viales interurbana): 4 registros
-- Portales y puntos kilométricos: 6 registros
-- Puntos de interés: 4 registros
-- Expendedurías (procedentes de Comisión de Tabacos): 2 registros
-- Puntos de recarga eléctrica (procedentes del Geoportal de Hidrocarburos): 2 registros
-- Topónimos (procedentes del Nomenclátor Geográfico Básico de España): 3 registros
-- Provincias: 1 registro
-- Comunidades autónomas: 1 registro
+Es importante comentar el **orden intrínseco de las tipologías, y el número de registros de cada tipología**, siendo lo siguiente:
+1. Poblaciones: 2 registros
+2. Municipio:  3 registros
+3. Callejero (viales urbanos): 7 registros
+4. Carretera (viales interurbana): 4 registros
+5. Portales y puntos kilométricos: 6 registros
+6. Puntos de interés: 4 registros
+7. Expendedurías (procedentes de Comisión de Tabacos): 2 registros
+8. Puntos de recarga eléctrica (procedentes del Geoportal de Hidrocarburos): 2 registros
+9. Topónimos (procedentes del Nomenclátor Geográfico Básico de España): 3 registros
+10. Provincias: 1 registro
+11. Comunidades autónomas: 1 registro
 
 🔹**RESPUESTA**
 
@@ -191,3 +191,20 @@ Requisitos:
 - Java 8
 - Tomcat 9
 - Visibilidad sobre Elasticsearch
+
+### Mapeo e indexación en Elasticsearch
+
+La información se encuentra en: *src/main/resources/elasticsearch*
+- *src/main/resources/elasticsearch/configuration*: configuración para que Elasticsearch tenga en cuenta
+  - *stopwords*: palabras y letras, que para cuando se busquen en el geocoder, Elasticsearch no las tenga en cuenta y vaya la búsqueda más rápida
+  - *synonyms*: sinónimos y abreviaturas de tipos de viales o de palabras en general, para que cuando se haga una búsqueda por ejemplo por *Colegio...* y se tenga en el JSON como *CEIP...* el geocoder de respuesta.
+    - **Nota**: Si se cambia el contenido de algunos de estos ficheros, para que funcione correctamente, hay que indexar todo de nuevo 
+- *src/main/resources/elasticsearch/mappings*: ficheros de ejecución *sh* para crear los índices (vacíos) por cada entidad:
+  - codigo_postal --> codigo_postal_mapping.json
+  - division_administrativa --> division_administrativa_mapping.json
+  - portal_pk --> portal_pk_mapping.json
+  - toponimo --> toponimo_mapping.json
+  - vial --> vial_mapping.json
+- *src/main/resources/elasticsearch/sample_data*: ejemplo de datos en formato JSON a indexar
+  
+
