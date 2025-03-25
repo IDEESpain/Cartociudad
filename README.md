@@ -147,7 +147,8 @@ Devuelve un JSON  con los mismo parámetros que en los casos anteriores: *candid
 
 ## 📊 Calculadora unificada de direcciones postales - lógica y requisitos
 
-Esta funcionalidad, que se encuentra accesible desde [aquí](https://www.cartociudad.es/web/portal/herramientas-calculos/conversor) implementa, en el mismo servicio, la geocodificación por nombre o por coordenadas geográficas de forma masiva y según un fichero CSV de entrada.
+Esta funcionalidad la integra el geocoder, y se encuentra accesible desde [aquí](https://www.cartociudad.es/web/portal/herramientas-calculos/conversor) implementa, en el mismo servicio, la geocodificación por nombre o por coordenadas geográficas de forma masiva y según un fichero CSV de entrada.
+Se ha establecido que pueda procesar hasta 60.000 registros, pero esto es configurable (unified_max_rows).
 
 Tanto los requisitos del CSV como su funcionamiento, se encuentran [aquí](https://www.idee.es/resources/documentos/Cartociudad/Instrucciones_conversor.pdf)
 
@@ -192,19 +193,40 @@ Requisitos:
 - Tomcat 9
 - Visibilidad sobre Elasticsearch
 
-### Mapeo e indexación en Elasticsearch
+### 🔸 Mapeo e indexación en Elasticsearch
 
 La información se encuentra en: *src/main/resources/elasticsearch*
 - *src/main/resources/elasticsearch/configuration*: configuración para que Elasticsearch tenga en cuenta
   - *stopwords*: palabras y letras, que para cuando se busquen en el geocoder, Elasticsearch no las tenga en cuenta y vaya la búsqueda más rápida
   - *synonyms*: sinónimos y abreviaturas de tipos de viales o de palabras en general, para que cuando se haga una búsqueda por ejemplo por *Colegio...* y se tenga en el JSON como *CEIP...* el geocoder de respuesta.
     - **Nota**: Si se cambia el contenido de algunos de estos ficheros, para que funcione correctamente, hay que indexar todo de nuevo 
-- *src/main/resources/elasticsearch/mappings*: ficheros de ejecución *sh* para crear los índices (vacíos) por cada entidad:
+- *src/main/resources/elasticsearch/mappings*: ficheros de ejecución *sh* para crear el mapeo de los índices (vacíos) por cada entidad:
   - codigo_postal --> codigo_postal_mapping.json
   - division_administrativa --> division_administrativa_mapping.json
   - portal_pk --> portal_pk_mapping.json
   - toponimo --> toponimo_mapping.json
   - vial --> vial_mapping.json
-- *src/main/resources/elasticsearch/sample_data*: ejemplo de datos en formato JSON a indexar
-  
+- *src/main/resources/elasticsearch/scripts*: fichero para indexar los datos
+  - codigo_postal --> carga_codigo_postal.sh
+  - division_administrativa --> carga_division_administrativa.sh
+  - portal_pk --> carga_portal_pk.sh
+  - toponimo --> carga_toponimo_mapping.sh
+  - vial --> carga_vial.sh
+- *src/main/resources/elasticsearch/sample_data*: ejemplo de datos del municipios de *Humanes de Madrid* en formato JSON a indexar
 
+**Pasos a realizar**
+
+1º) Mapeo de índices de cada entidad:
+
+  ```
+  sh mapping_ENTIDAD.sh
+  ```
+
+2º) Indexación de los datos JSON de cada entidad:
+
+  ```
+  bash carga_ENTIDAD_cnig.sh
+  ```
+
+3º) Comprobación de indexación:
+- http://[IP_ELASTIC]:9200/_cat/indices?v&pretty 
