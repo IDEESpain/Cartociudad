@@ -5,16 +5,40 @@ Servicio REST Geocoder proporciona funcionalidades de búsqueda y geolocalizaci�
 La principal mejora de este servicio sobre otras versiones anteriores es que funciona sobre Elasticsearch, que ejerce de motor de persistencia y búsqueda.
 Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cartociudad.es) y se dispone de documentación oficial sobre los servicios [aquí](https://www.idee.es/resources/documentos/Cartociudad/CartoCiudad_ServiciosWeb.pdf) 
 
+
+## 📇 Contenidos <a name="contenidos"></a>
+
+* 🚂 [Funcionalidades de los servicios](#-funcionalidades-de-los-servicios)
+* 🔍📍 [Búsqueda por nombre geográfico](#-búsqueda-por-nombre-geográfico)
+* *  🔍 [1. Candidates](#1-candidates)
+* *  📍 [2. Find](#-2-find)
+* 🌍 [Búsqueda por coordenadas geográficas](#-búsqueda-por-coordenadas-geográficas)
+* 📊 [Calculadora unificada de direcciones postales](#-calculadora-unificada-de-direcciones-postales)
+* 📁 [Archivos de referencia](#--archivos-de-referencia)
+* * 💻 [Configuración del servicio REST Geocoder](#-configuración-del-servicio-rest-geocoder)
+* * 🛠️ [Configuración del servicio SOAP de la D.G de Catastro](#️-configuración-del-servicio-soap-de-la-dg-de-catastro)
+* * 🗺️ [Configuración del visualizador propio del Geocoder](#️-configuración-del-visualizador-propio-del-geocoder)
+* 🚀 [Despliegue](#-despliegue)
+
+
+---
+
 ## 🚂 Funcionalidades de los servicios
+[👆 Volver](#-contenidos)
+
 El servicio REST geocoder tiene dos funcionalidades:
 - **Búsqueda por nombre geográfico**: a partir de una búsqueda de un elemento geográfico el servicio devuelve como resultado sus correspondientes coordenadas geográficas.
   - Búsqueda por referencia catastral: en el propio código del geocoder se ha integrado el servicio SOAP de la D. G de Catastro  
 - **Búsqueda por coordenadas geográficas**: a partir de unas coordenadas el servicio devuelve una dirección aproximada a dicho punto
 
-## 🌍 Búsqueda por nombre geográfico
+## 🔍📍 Búsqueda por nombre geográfico
+[👆 Volver](#-contenidos)
+
 Para obtener las coordenadas de un elemento geográfico hay que partir de dos métodos, uno seguido de otro:
 
-### 🔍1. CANDIDATES 
+### 🔍1. Candidates
+[👆 Volver](#-contenidos)
+
 El servicio a partir de una petición busca y devuelve un JSON con los resultados con similitud fonética al nombre geográfico buscado, junto con una serie de parámetros de información asociada. 
 
 🔸**PETICIONES HTTP GET**:
@@ -101,8 +125,10 @@ El servicio devuelve un fichero JSON con los resultados más parecidos fonética
 - geom: no disponible con esta petición.
 - state: 0 (este valor con la versión actual del geocoder, se ha suprimido, ya que se empleaelasticsearch y no se puede configurar la salida de candidates según grado de coincidencia).
 - stateMsg: Vacío (este valor con la versión actual del geocoder, se ha suprimido, ya que se emplea elasticsearch y no se puede configurar la salida candidates según grado de coincidencia)
+---
+### 📍 2. Find
+[👆 Volver](#-contenidos)
 
-### 📍 2. FIND 
 El método *find* permite geolocalizar el elemento elegido de la petición anterior *candidates* y obtener sus coordenadas geográficas. En este caso además de obtener coordenas de elementos puntuales, como en el método *candidates* también se obtienen coordenadas de los elementos lineales y superficiales.
 
 🔸**PETICIONES HTTP GET**:
@@ -129,6 +155,8 @@ La petición puede ser invocada de dos formas diferentes, haciendo variar así l
 El servicio devuelve un fichero JSON o GeoJSON con el resultado geolocalizado y con los mismo parámetros que la respuesta *candidates* pero incluyendo las coordenadas geográficas correspondientes del elemento.
 
 ## 🌍 Búsqueda por coordenadas geográficas
+[👆 Volver](#-contenidos)
+
 A partir de unas coordenadas geográficas (EPGS:4326) el servicio devuelve la dirección más próxima a dicho punto en un radio de 350 metros, elemento parametrizable  (reverse_buffer).
 
 🔸**PETICIÓN HTTP GET**:
@@ -145,7 +173,8 @@ Devuelve un JSON  con los mismo parámetros que en los casos anteriores: *candid
 
 ** **NOTA**: los campos longitud y latitud que se devuelven no son los que se muestran como parámetros de entrada en la petición, sino los correspondientes a la entidad que se devuelve en el resultado.
 
-## 📊 Calculadora unificada de direcciones postales - lógica y requisitos
+## 📊 Calculadora unificada de direcciones postales
+[👆 Volver](#-contenidos)
 
 Esta funcionalidad la integra el geocoder, y se encuentra accesible desde [aquí](https://www.cartociudad.es/web/portal/herramientas-calculos/conversor) implementa, en el mismo servicio, la geocodificación por nombre o por coordenadas geográficas de forma masiva y según un fichero CSV de entrada.
 Se ha establecido que pueda procesar hasta 60.000 registros, pero esto es configurable (unified_max_rows).
@@ -161,8 +190,13 @@ Envío de un CSV con los elementos a solicitar para su geolocalización.
 
 Devuelve un CSV con la misma cabecera que el envíado, añadiendo un nuevo campo OBSERVACIONES, que estable una observación de la búsqueda. Este CSV contiene los elementos geolocalizados con sus parámetros correspondientes.
 
-## 🛠️ Configuración del proyecto
-La propiedades de este servicio se recogen en el fichero */src/main/resources/configuration.properties*
+## 📁  Archivos de referencia
+A continuación se mencionan los archivos importantes del servicio REST Geocoder y del *ElasticSearch*.
+
+### 💻 Configuración del servicio REST Geocoder
+[👆 Volver](#-contenidos)
+
+La propiedades de este servicio se recogen en el fichero [***configuration.properties***](https://github.com/IDEESpain/Cartociudad/tree/main/src/main/resources)
 En la siguiente tabla se recogen aquellos que son configurables, dando el nombre, una descripción y un ejemplo de los mismos:
 
 | Nombre | Descripción | Ejemplo |
@@ -185,8 +219,62 @@ En la siguiente tabla se recogen aquellos que son configurables, dando el nombre
 | reverse_buffer | Buffer para el filtro de la consulta reverse (obtener direccion a partir de una x e y) | 350m |
 | unified_max_rows | Filas que se procesan del CSV (sin contar cabecera) | 60000 |
 
+### 🛠️ Configuración del servicio SOAP de la D.G de Catastro
+[👆 Volver](#-contenidos)
+
+El servicio REST está configurado para que se conecte al servicio SOAP de la dirección General de Catastro, para hacer consultas a referencias catastrales. 
+
+Mediante la geocodificación por identificador geográfico (*candidates o find*) se obtiene una dirección y coordenadas geográficas a partir de una referencia catastral. Para ello se hacen consultas con solo los primeros 14 dígitos. Ejemplo: 8128701YJ2782G
+
+* https://www.cartociudad.es/geocoder/api/geocoder/candidates?q=8128701YJ2782G
+* https://www.cartociudad.es/geocoder/api/geocoder/find?q=8128701YJ2782G&type=refcatastral&id=8128701YJ2782G
+
+El archivo que tiene este servicio incrustado es el [***GeocodingServiceElasticCore.java***](https://github.com/IDEESpain/Cartociudad/blob/main/src/main/java/com/ign/cartociudad/ws/core/GeocodingServiceElasticCore.java):
+
+  ```
+   */
+  *URL Consulta de Referencia Catastral
+	 */
+	public static final String REF_CATASTRAL_URL = "http://ovc.catastro.meh.es/ovcservweb/OVCSWLocalizacionRC/OVCCoordenadas.asmx/Consulta_CPMRC";
+	
+  ```
+
+### 🗺️ Configuración del visualizador propio del Geocoder
+[👆 Volver](#-contenidos)
+
+Por otro lado, se tiene un visualizador que se ha creado con la API-IDEE, para que se puedan hacer búsquedas directamente al geocoder a partir del *plugin locator*. Así en la URL https://IP:puerto/geocoder/ se tiene una herramienta visual del geocoder.
+
+El archivo de configuración es [***index.html***](https://github.com/IDEESpain/Cartociudad/blob/main/WebContent/index.html).
+
+La parte donde se ha integrado el *plugin Locator* es:
+
+```
+            const mp = new M.plugin.Locator({
+              position: 'TL',
+              collapsed: false,
+              collapsible:false,
+              useProxy:false,
+              tooltip:'Servicio REST geocoder',
+              ignsearchlocator:'entityFound',
+              byParcelCadastre:false,
+              byCoordinates:false,
+              byPlaceAddressPostal: {
+            	  servicesToSearch: 'g',
+            	  noProcess: '',
+            	  reverse: true,
+            	  maxResults: 33,
+            	  urlCandidates:'/geocoder/api/geocoder/candidatesJsonp',
+                  urlFind:'/geocoder/api/geocoder/findJsonp',
+                  urlReverse:'/geocoder/api/geocoder/reverseGeocode'
+              }
+            });
+            
+            mapjs.addPlugin(mp);   
+
+```
 
 ## 🚀 Despliegue
+[👆 Volver](#-contenidos)
 
 Requisitos:
 - Java 8
