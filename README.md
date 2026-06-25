@@ -15,7 +15,7 @@ Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cart
 * 🌍 [Búsqueda por coordenadas geográficas](#-búsqueda-por-coordenadas-geográficas)
 * 📊 [Calculadora unificada de direcciones postales](#-calculadora-unificada-de-direcciones-postales)
 * 📁 [Archivos de referencia](#--archivos-de-referencia)
-* * 💻 [Configuración del servicio REST Geocoder](#️-configuración-del-servicio-rest-geocoder)
+* * 💻 [Configuración del servicio REST Geocoder](#-configuración-del-servicio-rest-geocoder)
 * * 🛠️ [Configuración del servicio SOAP de la D.G de Catastro](#️-configuración-del-servicio-soap-de-la-dg-de-catastro)
 * * 🗺️ [Configuración del visualizador propio del Geocoder](#️-configuración-del-visualizador-propio-del-geocoder)
 * 🚀 [Despliegue](#-despliegue)
