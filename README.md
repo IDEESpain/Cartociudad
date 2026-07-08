@@ -1,8 +1,8 @@
 # Servicio REST Geocoder CartoCiudad
 ## ✍️ Descripción
-Servicio REST Geocoder proporciona funcionalidades de búsqueda y geolocalización sobre el conjunto de datos de entidades poblacionales, viales, portales, puntos kilométricos, puntos de interés (POI), códigos postales y referencias Catastrales (Servicio SOAP de la Dirección General de Catastro [D.G. Catastro]). Las fuentes de datos de estos elementos, se encuenta [aquí](https://www.cartociudad.es/web/portal/fuentes-oficiales)
+Servicio REST Geocoder proporciona funcionalidades de búsqueda y geolocalización sobre el conjunto de datos de entidades poblacionales, unidades administrativas, viales, portales, puntos kilométricos, puntos de interés (POI), topónimos, códigos postales y referencias Catastrales (Servicio SOAP de la Dirección General de Catastro [D.G. Catastro]). Las fuentes de datos de estos elementos, se encuenta [aquí](https://www.cartociudad.es/web/portal/fuentes-oficiales)
 
-La principal mejora de este servicio sobre otras versiones anteriores es que funciona sobre Elasticsearch, que ejerce de motor de persistencia y búsqueda.
+Este servicio funciona sobre Elasticsearch, que ejerce de motor de persistencia y búsqueda.
 Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cartociudad.es) y se dispone de documentación oficial sobre los servicios [aquí](https://www.idee.es/resources/documentos/Cartociudad/CartoCiudad_ServiciosWeb.pdf) 
 
 
@@ -16,8 +16,8 @@ Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cart
 * 📊 [Calculadora unificada de direcciones postales](#-calculadora-unificada-de-direcciones-postales)
 * 📁 [Archivos de referencia](#--archivos-de-referencia)
 * * 💻 [Configuración del servicio REST Geocoder](#-configuración-del-servicio-rest-geocoder)
-* * 🛠️ [Configuración del servicio SOAP de la D.G de Catastro](#️-configuración-del-servicio-soap-de-la-dg-de-catastro)
-* * 🗺️ [Configuración del visualizador propio del Geocoder](#️-configuración-del-visualizador-propio-del-geocoder)
+* * 🛠️ [GeocodingServiceElasticCore.java - Servicio SOAP de la D.G de Catastro](#️-geocodingserviceelasticcorejava---servicio-soap-de-la-dg-de-catastro)
+* * 🗺️ [Index.html - Visualizador propio del Geocoder](#️-indexhtml---visualizador-propio-del-geocoder)
 * 🚀 [Despliegue](#-despliegue)
 
 
@@ -29,7 +29,7 @@ Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cart
 El servicio REST geocoder tiene dos funcionalidades:
 - **Búsqueda por nombre geográfico**: a partir de una búsqueda de un elemento geográfico el servicio devuelve como resultado sus correspondientes coordenadas geográficas.
   - Búsqueda por referencia catastral: en el propio código del geocoder se ha integrado el servicio SOAP de la D. G de Catastro  
-- **Búsqueda por coordenadas geográficas**: a partir de unas coordenadas el servicio devuelve una dirección aproximada a dicho punto
+- **Búsqueda por coordenadas geográficas**: a partir de unas coordenadas el servicio devuelve la dirección más próxima a dicho punto en un radio de 350 metros.
 
 ## 🔍📍 Búsqueda por nombre geográfico
 [👆 Volver](#-contenidos)
@@ -75,7 +75,7 @@ https://www.cartociudad.es/geocoder/api/geocoder/candidates?q=salamanca&limit=6&
 https://www.cartociudad.es/geocoder/api/geocoder/candidates?q=colegio%20miguel%20hernandez&cod_postal_filter=28100
 
 ** **Nota**: para que estos filtros funcionen correctamente hay que escribir los nombres de las unidades administrativas y poblaciones de la forma oficial; es decir, como se tiene en
-CartoCiudad. Así, si se tiene duda se puede hacer primero una consulta al candidates del nombre del municipio, por ejemplo, y a continuación hacer la petición con el filtro de municipios.
+CartoCiudad. Así, si se tiene duda se puede hacer primero una consulta al candidates del nombre del municipio, por ejemplo, y a continuación hacer la petición con el filtro de municipios.También se tiene esta información pública en el Centro de Descargas del Centro Nacional de Información Geográfica, en [*Contenido Auxiliar*](https://centrodedescargas.cnig.es/CentroDescargas/documentos/Cartociudad_documentacion.zip).
 
 - **countrycodes** (opcional): identificador del país (por defecto 'es').
 - **limit** (opcional): Número máximo de coincidencias o resultados próximos a la consulta que se devolverán. Por defecto son 33, si se quieren menos hay que indicar con limit cuantos
@@ -120,11 +120,13 @@ El servicio devuelve un fichero JSON con los resultados más parecidos fonética
 - postalCode: Código postal (si corresponde).
 - countryCode: Código del país (por defecto '011' para España).
 - refCatastral: Referencia catastral (si corresponde).
-- lat: Coordenada que representa la latitud de la entidad de los elementos puntuales(portales, puntos kilométricos, puntos de interés y topónimos).
-- lng: Coordenada que representa la longitud de la entidad de los elementos puntuales (portales, puntos kilométricos, puntos de interés y topónimos).
+- lat: Coordenada geográfica (en WGS84; EPSG:4326) que representa la latitud de la entidad de los elementos puntuales(portales, puntos kilométricos, puntos de interés y topónimos).
+- lng: Coordenada geográfica (en WGS84; EPSG:4326) que representa la longitud de la entidad de los elementos puntuales (portales, puntos kilométricos, puntos de interés y topónimos).
 - geom: no disponible con esta petición.
 - state: 0 (este valor con la versión actual del geocoder, se ha suprimido, ya que se empleaelasticsearch y no se puede configurar la salida de candidates según grado de coincidencia).
-- stateMsg: Vacío (este valor con la versión actual del geocoder, se ha suprimido, ya que se emplea elasticsearch y no se puede configurar la salida candidates según grado de coincidencia)
+- stateMsg: Vacío (este valor con la versión actual del geocoder, se ha suprimido, ya que se emplea elasticsearch y no se puede configurar la salida candidates según grado de coincidencia).
+
+coordenadas 
 ---
 ### 📍 2. Find
 [👆 Volver](#-contenidos)
@@ -157,7 +159,9 @@ El servicio devuelve un fichero JSON o GeoJSON con el resultado geolocalizado y 
 ## 🌍 Búsqueda por coordenadas geográficas
 [👆 Volver](#-contenidos)
 
-A partir de unas coordenadas geográficas (EPGS:4326) el servicio devuelve la dirección más próxima a dicho punto en un radio de 350 metros, elemento parametrizable  (reverse_buffer).
+A partir de unas coordenadas geográficas (latitud y longitud en WGS84; EPSG:4326) el servicio devuelve la dirección más próxima a dicho punto en un radio de 350 metros, elemento parametrizable  (reverse_buffer) en el archivo de [*configuration.properties*](#-configuración-del-servicio-rest-geocoder).
+
+
 
 🔸**PETICIÓN HTTP GET**:
 - /geocoder/api/geocoder/reverseGeocode
@@ -216,13 +220,13 @@ En la siguiente tabla se recogen aquellos que son configurables, dando el nombre
 | expendeduria_table_name_elements | Número de elementos a mostrar de la tipología expededuría | 2 |
 | ngbe_table_name_elements | Número de elementos a mostrar de la tipología ngbe (Nomenclator Geográfico Básico de España) | 2 |
 | punto_recarga_electrica_table_name | Número de elementos a mostrar de la tipología punto de recarga eléctrica| 2 |
-| reverse_buffer | Buffer para el filtro de la consulta reverse (obtener direccion a partir de una x e y) | 350m |
+| reverse_buffer | Buffer para el filtro de la consulta reverse (obtener dirección a partir las coordenadas geográficas de latitud y longitud en WGS84; EPSG:4326) | 350m |
 | unified_max_rows | Filas que se procesan del CSV (sin contar cabecera) | 60000 |
 
-### 🛠️ Configuración del servicio SOAP de la D.G de Catastro
+### 🛠️ GeocodingServiceElasticCore.java - Servicio SOAP de la D.G de Catastro
 [👆 Volver](#-contenidos)
 
-El servicio REST está configurado para que se conecte al servicio SOAP de la dirección General de Catastro, para hacer consultas a referencias catastrales. 
+El servicio REST está configurado para que se conecte al servicio SOAP de la Dirección General de Catastro, para hacer consultas a referencias catastrales. 
 
 Mediante la geocodificación por identificador geográfico (*candidates o find*) se obtiene una dirección y coordenadas geográficas a partir de una referencia catastral. Para ello se hacen consultas con solo los primeros 14 dígitos. Ejemplo: 8128701YJ2782G
 
@@ -239,14 +243,15 @@ El archivo que tiene este servicio incrustado es el [***GeocodingServiceElasticC
 	
   ```
 
-### 🗺️ Configuración del visualizador propio del Geocoder
+### 🗺️ Index.html - Visualizador propio del Geocoder
 [👆 Volver](#-contenidos)
 
 Por otro lado, se tiene un visualizador que se ha creado con la API-IDEE, para que se puedan hacer búsquedas directamente al geocoder a partir del *plugin locator*. Así en la URL https://IP:puerto/geocoder/ se tiene una herramienta visual del geocoder.
 
 El archivo de configuración es [***index.html***](https://github.com/IDEESpain/Cartociudad/blob/main/WebContent/index.html).
 
-La parte donde se ha integrado el *plugin Locator* es:
+A continuación se muestra como está configurado el archivo, pero se puede modificar o añadir elementos. Para más información, se tiene el [Github público](https://github.com/Desarrollos-IDEE/API-IDEE/blob/master/api-idee-js/src/plugins/locator/README.md).
+
 
 ```
             const mp = new M.plugin.Locator({
