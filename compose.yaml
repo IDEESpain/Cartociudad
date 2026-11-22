@@ -1,0 +1,55 @@
+services:
+
+  elasticsearch:
+    image: elasticsearch:7.17.25
+    container_name: cartociudad-elasticsearch
+
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+
+    ports:
+      - "127.0.0.1:9201:9200"
+
+    volumes:
+      - cartociudad_es_data:/usr/share/elasticsearch/data
+      - ./src/main/resources/elasticsearch/configuration/stopwords:/usr/share/elasticsearch/config/stopwords:ro
+      - ./src/main/resources/elasticsearch/configuration/synonyms:/usr/share/elasticsearch/config/synonyms:ro
+
+    networks:
+      - cartociudad-net
+
+    restart: unless-stopped
+
+
+  geocoder:
+    build:
+      context: .
+      dockerfile: docker/geocoder/Dockerfile
+
+    image: cartociudad/geocoder:v1.1.0
+    container_name: geocoder-v1.1.0
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    environment:
+      ELASTIC_URL: http://cartociudad-elasticsearch:9200
+
+    depends_on:
+      - elasticsearch
+
+    networks:
+      - cartociudad-net
+
+    restart: unless-stopped
+
+
+volumes:
+  cartociudad_es_data:
+    external: true
+
+networks:
+  cartociudad-net:
+    external: true
