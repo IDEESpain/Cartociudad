@@ -1,0 +1,18 @@
+services:
+  geocoder:
+    build:
+      context: .
+      dockerfile: docker/geocoder/Dockerfile
+
+    image: cartociudad/geocoder:v1.1.0
+    container_name: geocoder-v1.1.0-remote
+
+    ports:
+      - "127.0.0.1:8082:8080"
+
+    environment:
+      ELASTIC_URL: ${ELASTIC_URL:?Debes configurar ELASTIC_URL}
+      ELASTIC_USER: ${ELASTIC_USER:-}
+      ELASTIC_PASS: ${ELASTIC_PASS:-}
+
+    restart: unless-stopped

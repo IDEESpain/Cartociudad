@@ -6,20 +6,27 @@ Este servicio funciona sobre Elasticsearch, que ejerce de motor de persistencia 
 Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cartociudad.es) y se dispone de documentación oficial sobre los servicios [aquí](https://www.idee.es/resources/documentos/Cartociudad/CartoCiudad_ServiciosWeb.pdf) 
 
 
-## 🐳 Inicio rápido con Docker
+## 🐳 Despliegue con Docker
 
-El servicio REST Geocoder de CartoCiudad puede desplegarse mediante **Docker Compose**, que permite ejecutar conjuntamente el Geocoder y Elasticsearch sin instalar manualmente Java, Maven o Tomcat.
+El servicio REST Geocoder de CartoCiudad puede desplegarse mediante **Docker Compose**, sin necesidad de instalar Java, Maven, Tomcat, Python ni Elasticsearch directamente en el equipo.
 
-Esta configuración está orientada a **desarrollo y pruebas**.
+Se ofrecen dos modalidades de despliegue:
+
+| Modalidad | Descripción |
+|---|---|
+| **Local** | Despliegue completo del Geocoder y Elasticsearch 7.17.25, con creación automática de los índices y carga de datos de ejemplo de Humanes de Madrid. |
+| **Externa** | Despliegue únicamente del Geocoder, conectado a un servidor Elasticsearch ya existente, con los índices de CartoCiudad previamente configurados y cargados. |
+
+La configuración está orientada a **entornos de desarrollo y pruebas**.
 
 ### 1. Requisitos previos
 
-Tener instalados:
+Para ambas modalidades es necesario disponer de:
 
-- [Git](https://git-scm.com/)
+- [Git](https://git-scm.com/).
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) o Docker Engine con Docker Compose.
 
-Comprobar que Docker está funcionando:
+Comprobar que Docker está instalado y funcionando:
 
 ```bash
 docker --version
@@ -28,7 +35,7 @@ docker compose version
 
 ### 2. Descargar el repositorio
 
-Desde un terminal:
+Abrir un terminal y ejecutar:
 
 ```bash
 git clone https://github.com/canocnig/Cartociudad.git
@@ -36,138 +43,273 @@ cd Cartociudad
 git switch feature/dockerizacion
 ```
 
-> **Nota:** durante el desarrollo, la configuración Docker se encuentra en la rama `feature/dockerizacion`. Estos cambios deben estar publicados en GitHub para poder seguir las instrucciones desde otro ordenador.
+> **Nota:** durante el desarrollo, la dockerización está disponible en la rama `feature/dockerizacion`. Cuando se integre en la rama principal, no será necesario ejecutar `git switch`.
 
-### 3. Preparar el almacenamiento y la red
+---
 
-En la configuración actual, Docker Compose reutiliza un volumen y una red externos. Es necesario crearlos antes del primer arranque:
+### 🟢 Opción A. Despliegue local con Elasticsearch y datos de ejemplo
 
-```bash
-docker volume create cartociudad_es_data
-docker network create cartociudad-net
-```
+Esta es la opción recomendada para probar el proyecto por primera vez.
 
-El volumen `cartociudad_es_data` almacena los índices y documentos de Elasticsearch y permite conservarlos aunque se eliminen los contenedores.
+Docker Compose se encarga de:
 
-Estos comandos solo son necesarios la primera vez.
+1. Construir la aplicación Geocoder utilizando Java 8 y Tomcat 9.
+2. Descargar e iniciar Elasticsearch 7.17.25.
+3. Crear automáticamente la red Docker y el volumen persistente.
+4. Esperar a que Elasticsearch esté disponible.
+5. Crear los cinco índices utilizando los mappings originales.
+6. Cargar los archivos JSON de ejemplo de Humanes de Madrid.
+7. Iniciar el Geocoder cuando haya finalizado correctamente la indexación.
 
-### 4. Construir y arrancar los servicios
+**No es necesario crear manualmente los índices, configurar Elasticsearch ni instalar Python.**
 
-Desde la raíz del repositorio, donde se encuentra `compose.yaml`:
+#### A.1. Construir y arrancar
+
+Desde el directorio raíz del repositorio, ejecutar:
 
 ```bash
 docker compose up -d --build
 ```
 
-Docker Compose realizará las siguientes operaciones:
+La primera ejecución puede tardar más debido a la descarga de imágenes y dependencias Java.
 
-1. Descargar la imagen de Elasticsearch 7.17.25.
-2. Construir la imagen del Geocoder utilizando Java 8 y Tomcat 9.
-3. Crear los contenedores del Geocoder y Elasticsearch.
-4. Conectar ambos servicios mediante la red Docker.
-5. Montar el volumen persistente y los archivos de configuración de Elasticsearch.
-
-La primera ejecución puede tardar más porque Maven descarga las dependencias Java necesarias.
-
-### 5. Comprobar el funcionamiento
-
-Consultar los contenedores:
+#### A.2. Comprobar los contenedores
 
 ```bash
-docker compose ps
+docker compose ps -a
 ```
 
-Una vez iniciados los servicios, estarán disponibles en las siguientes direcciones:
+El despliegue está preparado cuando se observa:
 
-| Servicio | URL |
+| Servicio | Estado esperado |
 |---|---|
-| Aplicación web del Geocoder | http://localhost:8080/geocoder/ |
-| Servicio REST Candidates | http://localhost:8080/geocoder/api/geocoder/candidates?q=Humanes%20de%20Madrid |
-| Elasticsearch | http://localhost:9201 |
-| Índices de Elasticsearch | http://localhost:9201/_cat/indices?v |
+| `elasticsearch` | Up (healthy) |
+| `es-init` | Exited (0) |
+| `geocoder` | Up |
 
-Para comprobar Elasticsearch:
+El contenedor `es-init` ejecuta automáticamente la carga de datos y finaliza. **Su estado `Exited (0)` es correcto y no representa un error.**
+
+Para revisar la inicialización:
 
 ```bash
-curl "http://localhost:9201/_cat/indices?v"
+docker compose logs es-init
 ```
 
-Para probar la API REST:
+#### A.3. Acceder al Geocoder
+
+Una vez iniciado el servicio:
+
+**Aplicación web:**
+
+http://localhost:8080/geocoder/
+
+**Ejemplo de petición REST Candidates:**
+
+http://localhost:8080/geocoder/api/geocoder/candidates?q=Humanes%20de%20Madrid
+
+También puede probarse desde un terminal:
 
 ```bash
 curl "http://localhost:8080/geocoder/api/geocoder/candidates?q=Humanes%20de%20Madrid"
 ```
 
-**Importante:** la configuración Docker arranca Elasticsearch, pero todavía no crea automáticamente los índices ni incorpora los datos de ejemplo.
+El servicio devuelve un JSON con los candidatos encontrados.
 
-En una instalación nueva, es necesario realizar previamente el mapeo y la indexación descritos en la sección [Despliegue](#-despliegue), utilizando los archivos incluidos en `src/main/resources/elasticsearch/`.
+#### A.4. Consultar Elasticsearch
 
-La inicialización automática de Elasticsearch está pendiente de incorporarse.
+Elasticsearch está disponible localmente en:
 
-### 6. Detener y reiniciar los servicios
+http://localhost:9201
 
-Detener los servicios conservando los contenedores:
+Para consultar los índices:
+
+```bash
+curl "http://localhost:9201/_cat/indices?v"
+```
+
+El despliegue local crea los siguientes índices con los datos de ejemplo:
+
+| Índice | Documentos |
+|---|---:|
+| `codigo_postal` | 1 |
+| `division_administrativa` | 3 |
+| `portal_pk` | 5.809 |
+| `toponimo` | 119 |
+| `vial` | 289 |
+| **Total** | **6.221** |
+
+Los datos proceden de los archivos incluidos en `src/main/resources/elasticsearch/sample_data/`.
+
+Los mappings y analizadores se obtienen de `src/main/resources/elasticsearch/mappings/` y `src/main/resources/elasticsearch/configuration/`.
+
+#### A.5. Detener y reiniciar
+
+Para detener los servicios:
 
 ```bash
 docker compose stop
 ```
 
-Volver a arrancarlos:
+Para volver a iniciarlos:
 
 ```bash
 docker compose start
 ```
 
-Consultar los registros:
-
-```bash
-docker compose logs -f
-```
-
-Consultar únicamente los registros del Geocoder:
+Para consultar los registros:
 
 ```bash
 docker compose logs -f geocoder
 ```
 
-Eliminar los contenedores y recursos de Compose que corresponda:
+Para eliminar los contenedores y la red del proyecto:
 
 ```bash
 docker compose down
 ```
 
-El volumen externo `cartociudad_es_data` se conserva.
+**Persistencia:** los índices se almacenan en el volumen Docker `cartociudad_es_data` y se conservan entre reinicios y recreaciones de contenedores.
 
-### 7. Configuración del despliegue
+No utilizar `docker compose down -v` si se desean conservar los datos.
 
-Los principales archivos utilizados son:
+---
 
-| Archivo | Función |
-|---|---|
-| `compose.yaml` | Define los servicios, redes, puertos y volúmenes |
-| `docker/geocoder/Dockerfile` | Construye la imagen del Geocoder |
-| `docker/geocoder/entrypoint.sh` | Prepara la configuración de conexión a Elasticsearch |
-| `WebContent/WEB-INF/web.xml` | Configuración de la aplicación web y Jersey |
-| `src/main/resources/elasticsearch/configuration/` | Archivos de sinónimos y palabras vacías |
-| `src/main/resources/elasticsearch/mappings/` | Definiciones de los índices |
-| `src/main/resources/elasticsearch/sample_data/` | Datos de ejemplo para las pruebas |
+### 🔵 Opción B. Despliegue con Elasticsearch externo
 
-**Versiones utilizadas:**
+Esta modalidad está destinada a organizaciones que ya disponen de una instalación Elasticsearch con los índices de CartoCiudad configurados y cargados.
 
-- Java 8
-- Apache Tomcat 9
-- Jersey 1.19.4
-- Elasticsearch 7.17.25
+En este caso, **Docker únicamente construye y ejecuta el Geocoder**.
 
-Por defecto, el Geocoder se conecta a Elasticsearch mediante la dirección interna:
+No se arranca Elasticsearch local, no se crea ningún índice y no se ejecuta el inicializador `es-init`.
 
-```text
-http://cartociudad-elasticsearch:9200
+Se utiliza el archivo `compose.remote.yaml`.
+
+#### B.1. Requisitos específicos
+
+Antes del despliegue hay que comprobar que:
+
+- Existe un servidor Elasticsearch accesible desde el contenedor Docker.
+- Los índices requeridos por el Geocoder ya están creados y contienen datos.
+- Los mappings y analizadores son compatibles con el Geocoder.
+- La versión y las API de Elasticsearch son compatibles con esta aplicación.
+- Se dispone de las credenciales necesarias, si el servidor requiere autenticación.
+
+La configuración local se ha validado con Elasticsearch **7.17.25**. Otras versiones deben comprobarse antes de utilizarlas.
+
+#### B.2. Configurar la conexión
+
+El Geocoder admite las siguientes variables de entorno:
+
+| Variable | Descripción | Obligatoria |
+|---|---|---|
+| `ELASTIC_URL` | Dirección HTTP o HTTPS del servidor Elasticsearch, incluyendo el puerto. | Sí |
+| `ELASTIC_USER` | Usuario de Elasticsearch si se utiliza autenticación básica. | Solo cuando sea necesario |
+| `ELASTIC_PASS` | Contraseña del usuario de Elasticsearch. | Solo cuando sea necesario |
+
+En **Windows PowerShell**, configurar la dirección:
+
+```powershell
+$env:ELASTIC_URL = "http://servidor-elasticsearch:9200"
 ```
 
-Los puertos están publicados exclusivamente en `localhost`, para su utilización desde el propio ordenador.
+Si el servidor requiere autenticación básica, configurar también:
 
-> **Advertencia:** esta configuración está destinada a desarrollo y pruebas. Elasticsearch tiene desactivada la autenticación y no debe exponerse directamente a Internet.
+```powershell
+$env:ELASTIC_USER = "usuario"
+$env:ELASTIC_PASS = "contraseña"
+```
+
+En **Linux o macOS**, las variables pueden definirse mediante:
+
+```bash
+export ELASTIC_URL="http://servidor-elasticsearch:9200"
+```
+
+Y, si se necesita autenticación:
+
+```bash
+export ELASTIC_USER="usuario"
+export ELASTIC_PASS="contraseña"
+```
+
+Las direcciones y credenciales anteriores son ejemplos y deben sustituirse por las correspondientes a la instalación.
+
+**Seguridad:** no incluir contraseñas, tokens ni direcciones internas sensibles en archivos versionados o publicados en GitHub. Para entornos corporativos, utilizar preferentemente mecanismos de gestión de secretos. Las variables de entorno pueden resultar visibles en la configuración del contenedor.
+
+#### B.3. Construir y arrancar únicamente el Geocoder
+
+Ejecutar:
+
+```bash
+docker compose -p cartociudad-remoto -f compose.remote.yaml up -d --build
+```
+
+Se utiliza el nombre de proyecto `cartociudad-remoto` para mantener este despliegue independiente del local.
+
+No se iniciará ningún contenedor Elasticsearch.
+
+#### B.4. Comprobar el funcionamiento
+
+Consultar el estado:
+
+```bash
+docker compose -p cartociudad-remoto -f compose.remote.yaml ps
+```
+
+Consultar los registros:
+
+```bash
+docker compose -p cartociudad-remoto -f compose.remote.yaml logs -f geocoder
+```
+
+El Geocoder remoto se publica, por defecto, en el puerto **8082**:
+
+**Aplicación web:**
+
+http://localhost:8082/geocoder/
+
+**Servicio REST Candidates:**
+
+http://localhost:8082/geocoder/api/geocoder/candidates?q=Humanes%20de%20Madrid
+
+Los resultados dependerán de los datos disponibles en el Elasticsearch externo.
+
+> **Nota:** el modo externo dispone de una configuración Docker Compose validada, pero debe comprobarse su funcionamiento con el servidor Elasticsearch de destino, incluyendo conectividad, autenticación y compatibilidad.
+
+#### B.5. Detener el servicio remoto
+
+```bash
+docker compose -p cartociudad-remoto -f compose.remote.yaml down
+```
+
+Este comando elimina el contenedor y la red Docker de esta modalidad. **No elimina ni modifica los índices almacenados en el Elasticsearch externo.**
+
+---
+
+### 📁 Archivos utilizados en el despliegue
+
+| Archivo | Descripción |
+|---|---|
+| `compose.yaml` | Despliegue local completo: Elasticsearch, inicializador y Geocoder. |
+| `compose.remote.yaml` | Despliegue del Geocoder conectado a Elasticsearch externo. |
+| `docker/geocoder/Dockerfile` | Construcción de la imagen Docker del Geocoder. |
+| `docker/geocoder/entrypoint.sh` | Configuración de la conexión a Elasticsearch al iniciar el contenedor. |
+| `docker/elasticsearch/init.py` | Creación automática de índices y carga de datos de ejemplo. |
+| `WebContent/WEB-INF/web.xml` | Configuración de Jersey y de la aplicación web. |
+| `src/main/resources/elasticsearch/mappings/` | Definiciones de los índices Elasticsearch. |
+| `src/main/resources/elasticsearch/configuration/` | Analizadores, palabras vacías y sinónimos. |
+| `src/main/resources/elasticsearch/sample_data/` | Datos de ejemplo de Humanes de Madrid. |
+
+### Consideraciones
+
+- El modo local está pensado para pruebas con datos de ejemplo, no para representar la cobertura nacional completa de CartoCiudad.
+- Los puertos se publican en `localhost`, de forma que los servicios no quedan expuestos directamente a la red.
+- Elasticsearch local tiene desactivada la autenticación y está destinado exclusivamente a desarrollo y pruebas.
+- El inicializador conserva los índices existentes que ya contienen documentos. No sustituye los procesos de actualización y gestión de datos de una instalación real.
+- Los despliegues de producción requieren revisar la seguridad, la memoria, la persistencia, la disponibilidad y la compatibilidad de versiones.
+
+---
+
 
 ---
 
@@ -443,7 +585,11 @@ A continuación se muestra como está configurado el archivo, pero se puede modi
 
 ```
 
-## 🚀 Despliegue
+## 🚀 Despliegue manual e indexación de Elasticsearch
+Este apartado describe la configuración e indexación manual de Elasticsearch y el despliegue tradicional del Geocoder.
+
+Para realizar una instalación local automatizada mediante Docker Compose, consultar el apartado [Despliegue con Docker](#-despliegue-con-docker).
+
 [👆 Volver](#-contenidos)
 
 Requisitos:
