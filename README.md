@@ -8,14 +8,14 @@ Geocoder sustenta las operaciones de búsqueda de [Cartociudad](https://www.cart
 
 ## 🐳 Despliegue con Docker
 
-El servicio REST Geocoder de CartoCiudad puede desplegarse mediante **Docker Compose**, sin necesidad de instalar Java, Maven, Tomcat, Python ni Elasticsearch directamente en el equipo.
+La dockerización del Servicio Rest Geocoder v1.1.0 se mantiene en la rama [`release/1.x`](https://github.com/IDEESpain/Cartociudad/tree/release/1.x) del repositorio oficial.
 
-Se ofrecen dos modalidades de despliegue:
+Esta rama permite mantener la versión 1 del Geocoder en paralelo al desarrollo de futuras versiones del servicio REST.
 
-| Modalidad | Descripción |
-|---|---|
-| **Local** | Despliegue completo del Geocoder y Elasticsearch 7.17.25, con creación automática de los índices y carga de datos de ejemplo de Humanes de Madrid. |
-| **Externa** | Despliegue únicamente del Geocoder, conectado a un servidor Elasticsearch ya existente, con los índices de CartoCiudad previamente configurados y cargados. |
+El despliegue está disponible en dos modalidades:
+
+- **Local:** Geocoder y Elasticsearch 7.17.25, con creación automática de índices y carga de datos de ejemplo.
+- **Externa:** Geocoder conectado a un Elasticsearch existente, con sus índices previamente creados y cargados.
 
 La configuración está orientada a **entornos de desarrollo y pruebas**.
 
@@ -35,15 +35,31 @@ docker compose version
 
 ### 2. Descargar el repositorio
 
-Abrir un terminal y ejecutar:
+Clonar el repositorio oficial de CartoCiudad:
 
 ```bash
-git clone https://github.com/canocnig/Cartociudad.git
+git clone https://github.com/IDEESpain/Cartociudad.git
 cd Cartociudad
-git switch feature/dockerizacion
 ```
 
-> **Nota:** durante el desarrollo, la dockerización está disponible en la rama `feature/dockerizacion`. Cuando se integre en la rama principal, no será necesario ejecutar `git switch`.
+Seleccionar la rama de mantenimiento de la versión 1, que incorpora el despliegue Docker:
+
+```bash
+git switch release/1.x
+```
+
+Alternativamente, para utilizar exactamente la distribución Docker publicada, se puede descargar la Release `v1.1.0-docker` desde:
+
+[Releases de CartoCiudad](https://github.com/IDEESpain/Cartociudad/releases)
+
+O seleccionar su etiqueta Git:
+
+```bash
+git checkout tags/v1.1.0-docker
+```
+
+> **Nota:** la rama `main` contiene actualmente la versión original del Geocoder v1.1.0, mientras que `release/1.x` incorpora la dockerización y permite mantener futuras correcciones compatibles con esta versión.
+
 
 ---
 
