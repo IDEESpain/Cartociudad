@@ -1,0 +1,83 @@
+services:
+
+  # Elasticsearch local
+  elasticsearch:
+    image: elasticsearch:7.17.25
+    container_name: cartociudad-elasticsearch
+
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms1g -Xmx1g"
+
+    ports:
+      - "127.0.0.1:9201:9200"
+
+    volumes:
+      - cartociudad_es_data:/usr/share/elasticsearch/data
+      - ./src/main/resources/elasticsearch/configuration/stopwords:/usr/share/elasticsearch/config/stopwords:ro
+      - ./src/main/resources/elasticsearch/configuration/synonyms:/usr/share/elasticsearch/config/synonyms:ro
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS 'http://localhost:9200/_cluster/health?wait_for_status=yellow&timeout=5s' > /dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 30s
+
+    restart: unless-stopped
+
+
+  # Inicialización automática de los datos de ejemplo
+  es-init:
+    image: python:3.12-slim
+    container_name: cartociudad-es-init
+
+    environment:
+      ELASTIC_URL: http://elasticsearch:9200
+
+    volumes:
+      - ./docker/elasticsearch/init.py:/app/init.py:ro
+      - ./src/main/resources/elasticsearch:/data:ro
+
+    working_dir: /app
+
+    command: ["python", "-u", "init.py"]
+
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+
+    restart: "no"
+
+
+  # Servicio REST Geocoder
+  geocoder:
+    build:
+      context: .
+      dockerfile: docker/geocoder/Dockerfile
+
+    image: cartociudad/geocoder:v1.1.0
+    container_name: geocoder-v1.1.0
+
+    ports:
+      - "127.0.0.1:8080:8080"
+
+    environment:
+      ELASTIC_URL: http://elasticsearch:9200
+
+    depends_on:
+      es-init:
+        condition: service_completed_successfully
+
+    restart: unless-stopped
+
+
+# Docker Compose crea el volumen si no existe.
+volumes:
+  cartociudad_es_data:
+    name: cartociudad_es_data
+
+
+# La red se crea automáticamente usando la red
+# predeterminada del proyecto Docker Compose.
